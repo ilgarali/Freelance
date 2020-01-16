@@ -2,7 +2,7 @@
 
 
     <!-- Page header -->
-    <header class="page-header bg-img" style="background-image: url(assets/img/bg-banner1.jpg);">
+    <header class="page-header bg-img" style="background-image: url(upload/fr.jpg);">
       <div class="container page-name">
         <h1 class="text-center">Browse resumes</h1>
         <p class="lead text-center">Use following search box to find resumes that fits your position better</p>
@@ -13,11 +13,11 @@
 
           <div class="row">
             <div class="form-group col-xs-12 col-sm-4">
-              <input type="text" class="form-control" placeholder="Keyword: name, skills, or tags">
+              <input type="text" id="keyword" class="form-control" placeholder="Keyword: name, skills, or tags">
             </div>
 
             <div class="form-group col-xs-12 col-sm-4">
-              <input type="text" class="form-control" placeholder="Location: city, state or zip">
+              <input type="text" id="location" class="form-control" placeholder="Location: city, state or zip">
             </div>
 
            
@@ -26,7 +26,7 @@
 
           <div class="button-group">
             <div class="action-buttons">
-              <button class="btn btn-primary">Apply filter</button>
+              <button class="btn btn-primary" id="filter">Apply filter</button>
             </div>
           </div>
 
@@ -44,27 +44,49 @@
         <div class="container">
           <div class="row">
 
+            <?php 
             
+            $limit = 5;
+            $sql = "SELECT * FROM freelancer ORDER BY fid DESC";
+            $stmt=$conn->prepare($sql);
+            $stmt->execute();
+            $total_post = $stmt->rowCount();
+            $total_pages = ceil($total_post/$limit);
+            if (!isset($_GET['page'])) {
+              $page=1;
+            }else{
+              $page=$_GET['page'];
+            }
+            $starting_limit =($page - 1) *$limit ;
+            
+            $sql2 = "SELECT *,CONCAT(`name`,' ',surname) as fullname FROM freelancer left join users on freelancer.user_id = users.id ORDER BY fid DESC LIMIT $starting_limit,$limit ";
+            $stmt2= $conn->prepare($sql2);
+            $stmt2->execute();
+            $data=$stmt2->fetchALl();
+            
+           
+            ?>
             
             <!-- Resume detail -->
-            <div class="col-xs-12">
-              <a class="item-block" href="resume-detail.html">
+            <div class="col-xs-12 search">
+              <a class="item-block" href="resume-detail.php?detail=<?php echo $data[0]['fid'] ?>">
                 <header>
-                  <img class="resume-avatar" src="assets/img/avatar.jpg" alt="">
+                  <img class="resume-avatar" src="upload/<?php echo $data[0]['dev_img'] ?>" alt="">
                   <div class="hgroup">
-                    <h4>John Doe</h4>
-                    <h5>Front-end developer</h5>
+                    <h4><?php echo $data[0]['fullname'] ?></h4>
+                    <h5> <?php echo $data[0]['head'] ?> </h5>
                   </div>
                 </header>
 
                 <div class="item-body">
-                  <p>20+ years of experience working on front-end development for major companies. I develop well-designed, accessible, and standards-based web sites and applications. Highly effective communicator and team leader with a proven track record of delivering quality work on time and within budget working as a remote employee. Experience and success in both agency and major corporate environments.</p>
+                  <p><?php echo $data[0]['description'] ?></p>
 
                   <div class="tag-list">
-                    <span>HTML5</span>
-                    <span>CSS3</span>
-                    <span>Bootstrap</span>
-                    <span>Wordpress</span>
+                  <?php $tag=explode(',',$data[0]['tags']); foreach ($tag as $tag) {
+                      # code...
+                    ?>
+                    <span><?php echo $tag; ?> </span>
+                   <?php  } ?>
                   </div>
                 </div>
 
@@ -72,17 +94,17 @@
                   <ul class="details cols-3">
                     <li>
                       <i class="fa fa-map-marker"></i>
-                      <span>Menlo Park, CA</span>
+                      <span><?php echo $data[0]['location'] ?> </span>
                     </li>
 
                     <li>
                       <i class="fa fa-money"></i>
-                      <span>$55 / hour</span>
+                      <span>$<?php echo $data[0]['salary'] ?>  / hour</span>
                     </li>
 
                     <li>
                       <i class="fa fa-certificate"></i>
-                      <span>Master of Computer Science</span>
+                      <span><?php echo $data[0]['major'] ?> </span>
                     </li>
                   </ul>
                 </footer>
@@ -93,23 +115,32 @@
 
           <div class="row">
             <!-- Resume detail -->
-            <div class="col-sm-12 col-md-6">
-              <a class="item-block" href="resume-detail.html">
+            <?php $d=0; foreach ($data as $key=> $data) {
+              if($key==0)
+              {
+                continue;
+              }
+              # code...
+             ?>
+            <div class="col-sm-12 col-md-6 search">
+              <a class="item-block" href="resume-detail.php?detail=<?php echo $data['fid'] ?>">
                 <header>
-                  <img class="resume-avatar" src="assets/img/avatar-1.jpg" alt="">
+                  <img class="resume-avatar" src="upload/<?php echo $data['dev_img'] ?>" alt="">
                   <div class="hgroup">
-                    <h4>Bikesh Soltanian</h4>
-                    <h5>Java developer</h5>
+                    <h4> <?php echo $data['fullname'] ?> </h4>
+                    <h5> <?php echo $data['head'] ?> </h5>
                   </div>
                 </header>
 
                 <div class="item-body">
-                  <p>I develop well-designed, accessible, and standards-based web sites and applications. Highly effective communicator and team leader with a proven track record of delivering quality work on time and within budget working as a remote employee.</p>
+                  <p> <?php echo substr($data['description'],0,150) ?> </p>
 
                   <div class="tag-list">
-                    <span>J2EE</span>
-                    <span>J2SE</span>
-                    <span>Android</span>
+                  <?php $tag=explode(',',$data['tags']); foreach ($tag as $tag) {
+                      # code...
+                    ?>
+                    <span><?php echo $tag; ?> </span>
+                   <?php  } ?>
                   </div>
                 </div>
 
@@ -117,19 +148,19 @@
                   <ul class="details cols-2">
                     <li>
                       <i class="fa fa-map-marker"></i>
-                      <span>Fairfield, IA</span>
+                      <span><?php echo $data['location'] ?></span>
                     </li>
 
                     <li>
                       <i class="fa fa-money"></i>
-                      <span>$60 / hour</span>
+                      <span>$<?php echo $data['salary'] ?> / hour</span>
                     </li>
                   </ul>
                 </footer>
               </a>
             </div>
             <!-- END Resume detail -->
-
+<?php } ?>
 
          
 
@@ -146,10 +177,18 @@
                   <i class="ti-angle-left"></i>
                 </a>
               </li>
-              <li><a href="#">1</a></li>
-              <li class="active"><a href="#">2</a></li>
-              <li><a href="#">3</a></li>
-              <li><a href="#">4</a></li>
+              <?php 
+              
+              for ($page=1; $page <= $total_pages; $page++) { 
+                
+              
+              ?>
+
+<li><a href="<?php echo "?page=$page"; ?>"><?php  echo $page; ?></a></li>
+
+            <?php } ?>
+             
+              
               <li>
                 <a href="#" aria-label="Next">
                   <i class="ti-angle-right"></i>
@@ -164,77 +203,95 @@
       </section>
     </main>
     <!-- END Main container -->
+<script>
+let filter = document.getElementById('filter');
+filter.addEventListener("click",(e) => {
+  e.preventDefault();
+  let keyword = document.getElementById('keyword').value;
+  let location = document.getElementById('location').value;
+  const resumefind = "resumefind.php";
+  let formData = new FormData();
+  formData.append("keyword",keyword);
+  formData.append("location",location);
+
+  fetch(resumefind,{
+    method:"post",
+    body:formData
+  }).then((res) => res.json())
+  .then((res) => insertJs(res))
+  .catch((error) => console.log(error))
+
+});
+
+function insertJs (res) { 
+  let search = document.querySelectorAll('.search');
+  for (let i = 0; i < search.length; i++) {
+    search[i].innerHTML="";
+    }
+    res.forEach(element => {
+      let d= 0;
+      let fid = element.fid;
+      let head = element.head;
+      let dev_img = element.dev_img;
+      let description = element.description;
+      let fullname = element.fullname;
+      let location = element.location;
+      let salary = element.salary;
+      let major = element.major;
+
+      let tags = element.tags;
+      
+      
+      let splitetag = tags.split(",");
+
+     
+        
+
+      search[d].innerHTML+=` <a class="item-block" href="resume-detail.php?detail=${fid}">
+                <header>
+                  <img class="resume-avatar" src="upload/${dev_img}" alt="">
+                  <div class="hgroup">
+                    <h4>${fullname}</h4>
+                    <h5> ${head} </h5>
+                  </div>
+                </header>
+
+                <div class="item-body">
+                  <p>${description}</p>
+
+                  <div class="tag-list">
+                  
+                    <span id="tag">${tags}</span>
+                                 
+                  </div>
+                </div>
+
+                <footer>
+                  <ul class="details cols-3">
+                    <li>
+                      <i class="fa fa-map-marker"></i>
+                      <span>${location} </span>
+                    </li>
+
+                    <li>
+                      <i class="fa fa-money"></i>
+                      <span>$${salary}  / hour</span>
+                    </li>
+
+                    <li>
+                      <i class="fa fa-certificate"></i>
+                      <span>${major} </span>
+                    </li>
+                  </ul>
+                </footer>
+              </a>`;
 
 
-    <!-- Site footer -->
-    <footer class="site-footer">
+    });
 
-      <!-- Top section -->
-      <div class="container">
-        <div class="row">
-          <div class="col-sm-12 col-md-6">
-            <h6>About</h6>
-            <p class="text-justify">An employment website is a web site that deals specifically with employment or careers. Many employment websites are designed to allow employers to post job requirements for a position to be filled and are commonly known as job boards. Other employment sites offer employer reviews, career and job-search advice, and describe different job descriptions or employers. Through a job website a prospective employee can locate and fill out a job application.</p>
-          </div>
+ }
 
-          <div class="col-xs-6 col-md-3">
-            <h6>Company</h6>
-            <ul class="footer-links">
-              <li><a href="page-about.html">About us</a></li>
-              <li><a href="page-typography.html">How it works</a></li>
-              <li><a href="page-faq.html">Help center</a></li>
-              <li><a href="page-typography.html">Privacy policy</a></li>
-              <li><a href="page-contact.html">Contact us</a></li>
-            </ul>
-          </div>
-
-          <div class="col-xs-6 col-md-3">
-            <h6>Trendeing jobs</h6>
-            <ul class="footer-links">
-              <li><a href="job-list.html">Front-end developer</a></li>
-              <li><a href="job-list.html">Android developer</a></li>
-              <li><a href="job-list.html">iOS developer</a></li>
-              <li><a href="job-list.html">Full stack developer</a></li>
-              <li><a href="job-list.html">Project administrator</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <hr>
-      </div>
-      <!-- END Top section -->
-
-      <!-- Bottom section -->
-      <div class="container">
-        <div class="row">
-          <div class="col-md-8 col-sm-6 col-xs-12">
-            <p class="copyright-text">Copyrights &copy; 2016 All Rights Reserved by <a href="http://themeforest.net/user/shamsoft">ShaMSofT</a>.</p>
-          </div>
-
-          <div class="col-md-4 col-sm-6 col-xs-12">
-            <ul class="social-icons">
-              <li><a class="facebook" href="#"><i class="fa fa-facebook"></i></a></li>
-              <li><a class="twitter" href="#"><i class="fa fa-twitter"></i></a></li>
-              <li><a class="dribbble" href="#"><i class="fa fa-dribbble"></i></a></li>
-              <li><a class="linkedin" href="#"><i class="fa fa-linkedin"></i></a></li>
-              <li><a class="instagram" href="#"><i class="fa fa-instagram"></i></a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <!-- END Bottom section -->
-
-    </footer>
-    <!-- END Site footer -->
+</script>
 
 
-    <!-- Back to top button -->
-    <a id="scroll-up" href="#"><i class="ti-angle-up"></i></a>
-    <!-- END Back to top button -->
-
-    <!-- Scripts -->
-    <script src="assets/js/app.min.js"></script>
-    <script src="assets/js/custom.js"></script>
-
-  </body>
-</html>
+<?php  include_once "includes/footer.php";?>
