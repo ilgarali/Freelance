@@ -172,7 +172,8 @@ img{ max-width:100%;}
              # code...
            
            ?>
-
+ <?php
+        if ($sessid != $data['from_id']) { ?>
     <div class="chat_list active_chat">
     
       <div class="chat_people">
@@ -180,6 +181,8 @@ img{ max-width:100%;}
         <div class="chat_ib">
           <h5> <a href="message-new.php?message=<?php echo $data['from_id'] ?>">
         <?php
+       
+        
        
           
         
@@ -195,7 +198,7 @@ img{ max-width:100%;}
       </div>
     </div>
     
-          <?php  } ?>
+          <?php  } } ?>
          
           
            

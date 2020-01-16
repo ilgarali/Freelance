@@ -78,7 +78,7 @@ session_start();
          
           </li>
           <li>
-            <a href="#">Position</a>
+            
             <ul>
           <?php 
          if (isset($id)) {
@@ -149,7 +149,7 @@ session_start();
               </ul>
             </li>';
           }
-          else{
+          elseif($data['type'] == 2){
             echo ' <a href="#">Resume</a>
             <ul>
               <li><a href="resume-list.php">Browse resumes</a></li>
@@ -167,6 +167,7 @@ session_start();
                 <li><a href="company-manage.php">Manage companies</a></li>
               </ul>
             </li>
+             <a href="back/admin.php">Admin Panel</a>
             ';
           }
          }

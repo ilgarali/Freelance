@@ -73,16 +73,21 @@
               
               <?php 
               
-              $sessid= $_SESSION['id'];
+         
+
+              if (isset($_SESSION['id'])) {
+                     $sessid= $_SESSION['id'];
               $sql2 = "SELECT `type` FROM users WHERE id =? ";
               $stmt2=$conn->prepare($sql2);
               $stmt2->execute([$sessid]);
               $data2 = $stmt2->fetch();
-              if ($data2['type'] != 0) {
+               if ($data2['type'] != 0) {
                 echo '<a class="btn btn-primary" href="#">Apply with linkedin</a>
                 <a class="btn btn-success apply"  href="job-apply.php?apply='.$data['jid'].'">Apply now</a>
                 ';
-              } ?>
+              }
+              }
+              ?>
               
               
             </div>

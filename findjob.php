@@ -6,6 +6,8 @@ if (!isset($_SESSION['id'])) {
 }
 $location = $_POST['location'];
 $title = $_POST['title'];
+$selectcategory =$_POST['selectcategory'];
+
 
 
 if (trim(isset($title)) && trim(is_string($title)) && trim(!empty($title)) && 
@@ -31,6 +33,14 @@ elseif (trim(isset($location)) && trim(is_string($location)) && trim(!empty($loc
     $sql = "SELECT * FROM job_posts WHERE job_location LIKE ? ";
      $stmt =$conn->prepare($sql);
      $stmt->execute(["%" . $location . "%"]);
+     $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+     echo json_encode($datas);
+
+}
+elseif (trim(isset($selectcategory)) && trim(is_string($selectcategory)) && trim(!empty($selectcategory))) {
+    $sql = "SELECT * FROM job_posts WHERE job_category LIKE ? ";
+     $stmt =$conn->prepare($sql);
+     $stmt->execute(["%" . $selectcategory . "%"]);
      $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
      echo json_encode($datas);
 

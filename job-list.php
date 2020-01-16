@@ -20,7 +20,7 @@
             </div>
 
             <div class="form-group col-xs-12 col-sm-4">
-              <select class="form-control selectpicker" multiple>
+              <select id="selectcategory" class="form-control selectpicker" >
                 <option selected>All categories</option>
                 <option>Developer</option>
                 <option>Designer</option>
@@ -35,97 +35,10 @@
             </div>
 
 
-            <div class="form-group col-xs-12 col-sm-4">
-              <h6>Contract</h6>
-              <div class="checkall-group">
-                <div class="checkbox">
-                  <input type="checkbox" id="contract1" name="contract" checked>
-                  <label for="contract1">All types</label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="contract2" name="contract">
-                  <label for="contract2">Full-time <small>(354)</small></label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="contract3" name="contract">
-                  <label for="contract3">Part-time <small>(284)</small></label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="contract4" name="contract">
-                  <label for="contract4">Internship <small>(169)</small></label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="contract5" name="contract">
-                  <label for="contract5">Freelance <small>(480)</small></label>
-                </div>
-              </div>
-            </div>
+         
 
 
-            <div class="form-group col-xs-12 col-sm-4">
-              <h6>Hourly rate</h6>
-              <div class="checkall-group">
-                <div class="checkbox">
-                  <input type="checkbox" id="rate1" name="rate" checked>
-                  <label for="rate1">All rates</label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="rate2" name="rate">
-                  <label for="rate2">$0 - $50 <small>(364)</small></label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="rate3" name="rate">
-                  <label for="rate3">$50 - $100 <small>(684)</small></label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="rate4" name="rate">
-                  <label for="rate4">$100 - $200 <small>(195)</small></label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="rate5" name="rate">
-                  <label for="rate5">$200+ <small>(39)</small></label>
-                </div>
-              </div>
-            </div>
-
-
-            <div class="form-group col-xs-12 col-sm-4">
-              <h6>Academic degree</h6>
-              <div class="checkall-group">
-                <div class="checkbox">
-                  <input type="checkbox" id="degree1" name="degree" checked>
-                  <label for="degree1">All degrees</label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="degree2" name="degree">
-                  <label for="degree2">Associate degree <small>(216)</small></label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="degree3" name="degree">
-                  <label for="degree3">Bachelor's degree <small>(569)</small></label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="degree4" name="degree">
-                  <label for="degree4">Master's degree <small>(439)</small></label>
-                </div>
-
-                <div class="checkbox">
-                  <input type="checkbox" id="degree5" name="degree">
-                  <label for="degree5">Doctoral degree <small>(84)</small></label>
-                </div>
-              </div>
-            </div>
+       
 
           </div>
 
@@ -149,10 +62,7 @@
         <div class="container">
           <div class="row">
 
-            <div class="col-xs-12">
-              <br>
-              <h5>We found <strong>357</strong> matches, you're watching <i>10</i> to <i>20</i></h5>
-            </div>
+            
 
 
             <?php 
@@ -161,7 +71,7 @@
             $stmt2 =$conn->prepare($sql2);
             $stmt2->execute();
             $total_result = $stmt2->rowCount();
-            $page=ceil($total_result/$limit);
+            $totalpage=ceil($total_result/$limit);
             if (!isset($_GET['page'])) {
               $page=1;
             }else{
@@ -237,7 +147,7 @@
                   <i class="ti-angle-left"></i>
                 </a>
               </li>
-              <?php for ($page=1; $page <= $total_result; $page++) { 
+              <?php for ($page=1; $page <= $totalpage; $page++) { 
         # code...
        ?>
                 <li><a href="<?php echo "?page=$page"; ?>"><?php  echo $page; ?></a></li>
@@ -261,12 +171,19 @@
         e.preventDefault();
         let job_title = document.getElementById("job_title").value;
         let job_location = document.getElementById("job_location").value;
+        let selectcategory = document.getElementById("selectcategory").value;
+    
+        
+        
 
-        const findjob = "findindex.php";
+        const findjob = "findjob.php";
         let formData = new FormData();
+        
+
+
         formData.append("title",job_title);
         formData.append("location",job_location);
-
+        formData.append("selectcategory",selectcategory);
         fetch(findjob,{
           method:"post",
           body:formData
@@ -286,7 +203,7 @@ for (let d = 0; d < search.length; d++) {
     search[d].innerHTML='';
     
   }
-let jid,cover_img,job_title,location,job_type,job_short;
+let jid,cover_img,job_title,location,job_type,job_short,created_at,job_salary,job_degree;
 res.forEach(element => {
    jid = element.jid;
    cover_img = element.cover_img;
@@ -294,25 +211,46 @@ res.forEach(element => {
    job_location = element.job_location;
    job_type = element.job_type;
    job_short = element.job_short;
+   created_at = element.created_at;
+   job_salary = element.salary;
+   job_degree = element.degree;
    let d = 0;
 
 
   search[d].innerHTML += `  
+  <a class="item-block" href="job-detail.php?jobdetail=${jid}">
+                <header>
+                  <img src="upload/${cover_img}" alt="">
+                  <div class="hgroup">
+                    <h4>${job_title}</h4>
+                    <h5> <span class="label label-success"> ${job_type} </span></h5>
+                  </div>
+                  <time datetime="2016-03-10 20:00"> ${created_at} </time>
+                </header>
 
-      <a class="item-block" href="job-detail.php?jobdetail=${jid}">
-        <header>
-          <img src="upload/${cover_img}" alt="">
-          <div class="hgroup">
-            <h4>${job_title}</h4>
-            <h4>${job_short.substr(0,150)}</h4>
-          </div>
-          <div class="header-meta">
-            <span class="location">${job_location}</span>
-            <span class="label label-success">${job_type}</span>
-          </div>
-        </header>
-      </a>
-  
+                <div class="item-body">
+                  <p>${job_short.substr(0,333)}</p>
+                </div>
+
+                <footer>
+                  <ul class="details cols-3">
+                    <li>
+                      <i class="fa fa-map-marker"></i>
+                      <span> ${job_location}</span>
+                    </li>
+
+                    <li>
+                      <i class="fa fa-money"></i>
+                      <span> $${job_salary} / hourly </span>
+                    </li>
+
+                    <li>
+                      <i class="fa fa-certificate"></i>
+                      <span> ${job_degree} </span>
+                    </li>
+                  </ul>
+                </footer>
+              </a>
      
      `;
      d++;
